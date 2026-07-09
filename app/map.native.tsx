@@ -1,5 +1,5 @@
 import * as Location from 'expo-location';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, Modal, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { Callout, Marker, Polyline, PROVIDER_DEFAULT, PROVIDER_GOOGLE } from 'react-native-maps';
@@ -36,6 +36,9 @@ export default function MapNative() {
   const [selectedRouteIndex, setSelectedRouteIndex] = useState<number>(0); // 選中的路線索引
   const [renderKey, setRenderKey] = useState<number>(0); // 強制重新渲染的 key
   const router = useRouter();
+  const { from: fromParam, to: toParam } = useLocalSearchParams<{ from?: string; to?: string }>();
+  const fromStop = Array.isArray(fromParam) ? fromParam[0] : fromParam;
+  const toStop = Array.isArray(toParam) ? toParam[0] : toParam;
   const plannerRef = useRef(new BusPlannerService());
   const isAnimatingRef = useRef(false); // 防止動畫衝突
   const animationTimeoutRef = useRef<any>(null);
@@ -170,15 +173,16 @@ export default function MapNative() {
     })();
   }, []);
 
-  // 初始化 BusPlannerService 並查詢測試路線
+  // 初始化 BusPlannerService，並在有起訖站參數時查詢路線
   useEffect(() => {
     (async () => {
       try {
         await plannerRef.current.initialize();
         console.log('BusPlannerService 初始化完成');
-        
-        // 測試：查詢「師大分部」到「師大」的路線
-        const routes = await plannerRef.current.plan('師大分部', '師大');
+
+        if (!fromStop || !toStop) return;
+
+        const routes = await plannerRef.current.plan(fromStop, toStop);
         console.log('找到路線數量:', routes.length);
         if (routes.length > 0) {
           console.log('第一條路線:', routes[0].routeName, routes[0].directionText);
@@ -188,18 +192,18 @@ export default function MapNative() {
         console.error('路線規劃初始化錯誤:', error);
       }
     })();
-  }, []);
+  }, [fromStop, toStop]);
 
   // 更新路線動態資訊
   const updateRouteInfo = async () => {
-    if (routeInfo.length === 0 || isUpdatingRoute) return;
-    
+    if (!fromStop || !toStop || routeInfo.length === 0 || isUpdatingRoute) return;
+
     try {
       setIsUpdatingRoute(true);
       console.log('更新路線動態...');
-      
+
       // 重新查詢路線以獲取最新的到站時間
-      const routes = await plannerRef.current.plan('師大分部', '師大');
+      const routes = await plannerRef.current.plan(fromStop, toStop);
       if (routes.length > 0) {
         setRouteInfo(routes);
         console.log('路線動態更新完成，找到', routes.length, '條路線');

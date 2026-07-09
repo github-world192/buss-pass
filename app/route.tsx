@@ -570,6 +570,12 @@ export default function RouteScreen() {
                 </Text>
                 <View style={styles.headerActions}>
                   <TouchableOpacity
+                    onPress={() => router.push({ pathname: '/map', params: { from: fromStop, to: toStop } })}
+                    style={styles.refreshButton}
+                  >
+                    <Text style={styles.refreshButtonText}>🗺 地圖</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
                     onPress={toggleFavorite}
                     style={styles.favoriteButton}
                   >
