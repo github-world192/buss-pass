@@ -1,6 +1,7 @@
 // components/ServiceWorkerRegister.tsx
 import { useEffect } from 'react';
 import { Platform } from 'react-native';
+import { getWebBasePath, withWebBasePath } from '../constants/web';
 
 export default function ServiceWorkerRegister() {
   useEffect(() => {
@@ -17,9 +18,10 @@ export default function ServiceWorkerRegister() {
     // 2. 定義註冊函式
     const registerSW = async () => {
       try {
+        const basePath = getWebBasePath();
         // 指向 public 資料夾中的 service-worker.js
-        const registration = await navigator.serviceWorker.register('/service-worker.js', {
-          scope: '/',
+        const registration = await navigator.serviceWorker.register(withWebBasePath('/service-worker.js'), {
+          scope: basePath ? `${basePath}/` : '/',
         });
 
         console.log('[SW] 註冊成功，Scope:', registration.scope);

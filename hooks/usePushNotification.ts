@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Platform } from 'react-native';
+import { withWebBasePath } from '../constants/web';
 
 interface NotificationPermission {
   granted: boolean;
@@ -103,7 +104,7 @@ export default function usePushNotification() {
         const options: PushSubscriptionOptionsInit = {
           userVisibleOnly: true,
           ...(vapidPublicKey && {
-            applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+            applicationServerKey: urlBase64ToUint8Array(vapidPublicKey) as BufferSource,
           }),
         };
 
@@ -150,9 +151,10 @@ export default function usePushNotification() {
       return;
     }
 
+    const iconPath = withWebBasePath('/assets/icon.png');
     const defaultOptions: NotificationOptions = {
-      icon: '/assets/icon.png', // 確保路徑正確
-      badge: '/assets/icon.png',
+      icon: iconPath,
+      badge: iconPath,
       // vibrate: [200, 100, 200],
       ...options,
     };
@@ -178,7 +180,7 @@ export default function usePushNotification() {
         // Android 的死穴：如果沒有 SW，new Notification 必死
         // 但我們這裡做一個最後掙扎，因為如果不跑這行，Android 就是完全沒反應
         try {
-          const n = new Notification(title, defaultOptions);
+          new Notification(title, defaultOptions);
           console.log('[Debug] 3. 傳統 Notification 發送成功');
         } catch (e) {
           // 這裡就是你原本遇到的 Illegal constructor 錯誤

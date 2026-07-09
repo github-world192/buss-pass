@@ -32,27 +32,28 @@
 
    建置完成後，檔案會輸出到 `dist/` 目錄。
 
-## 部署到 Vercel
+## 部署到 GitHub Pages
 
-1. 安裝 Vercel CLI（如果尚未安裝）
+專案已新增 `.github/workflows/github-pages-deploy.yml`，推送到 `map-integration`、`main` 或 `master` 時會自動部署到 GitHub Pages。
 
-   ```bash
-   npm install -g vercel
-   ```
+### 一次性設定
 
-2. 登入 Vercel
+1. 到 GitHub repository 的 **Settings → Pages**
+2. 在 **Source** 選擇 **GitHub Actions**
 
-   ```bash
-   vercel login
-   ```
+### 本地建置 GitHub Pages 版本
 
-3. 部署專案
+```bash
+EXPO_PUBLIC_BASE_PATH=/expo-Bus-Route-App npm run build:web:pages
+```
 
-   ```bash
-   vercel --prod
-   ```
+部署後網址會是：
 
-   或直接推送到 GitHub，Vercel 會自動部署。
+```text
+https://github-world192.github.io/expo-Bus-Route-App/
+```
+
+這個建置會自動處理 GitHub Pages 需要的 repo base path、`.nojekyll`，以及 `/route`、`/search` 這類頁面的靜態路由目錄。
 
 ## PWA 功能
 

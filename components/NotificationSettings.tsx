@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Platform, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { withWebBasePath } from '../constants/web';
 import usePushNotification from '../hooks/usePushNotification';
 
 export default function NotificationSettings() {
@@ -14,6 +15,7 @@ export default function NotificationSettings() {
   const [debugInfo, setDebugInfo] = useState('');
   const [isStandalone, setIsStandalone] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
+  const iconPath = withWebBasePath('/assets/icon.png');
 
   useEffect(() => {
     if (Platform.OS !== 'web') {
@@ -64,7 +66,7 @@ export default function NotificationSettings() {
         // 顯示測試通知
         showLocalNotification('通知已啟用 ✅', {
           body: '您將收到公車到站提醒',
-          icon: '/assets/icon.png',
+          icon: iconPath,
         });
       }
     } else {
@@ -78,8 +80,8 @@ export default function NotificationSettings() {
     // 加入 await 確保錯誤能被捕捉（若有的話）
     await showLocalNotification('測試通知 🚌', {
       body: '這是一則測試通知訊息',
-      icon: '/assets/icon.png',
-      badge: '/assets/icon.png',
+      icon: iconPath,
+      badge: iconPath,
       // vibrate: [200, 100, 200], 
       // 註：若在 Android PWA 想要震動，建議解開 vibrate 註解
     });
